@@ -9,7 +9,9 @@ reflect real-time changes to a database
 from flask import Flask, jsonify, request
 import csv, json
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    return app
 
 prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
