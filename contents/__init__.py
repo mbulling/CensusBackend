@@ -9,13 +9,15 @@ reflect real-time changes to a database
 from flask import Flask, jsonify, request
 import csv, json
 
-def create_app():
-    app = Flask(__name__)
-    return app
+app = Flask(__name__)
 
 prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
+
+@app.route('/')
+def home():
+    return "<h1>API is running</h1>"
 
 def readproffromCSV(csv_file):
     try:
