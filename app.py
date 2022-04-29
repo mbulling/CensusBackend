@@ -7,9 +7,15 @@ reflect real-time changes to a database
 """
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 import csv, json
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
@@ -114,6 +120,7 @@ def GetAllProfessors2():
     return {'all_professors2' : profList}
 
 @app.route('/get50best', methods=['GET'])
+@cross_origin()
 def get50best():
     profList = []
     for prof in prof_list:
