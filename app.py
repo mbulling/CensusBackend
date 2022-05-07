@@ -90,6 +90,7 @@ medians_list = readmediansfromCSV(course_medians)['medians_list']
 import random
 
 @app.route('/all_professors_home', methods=['GET'])
+@cross_origin()
 def GetAllProfessorsHome():
     profList = []
     for prof in prof_list:
