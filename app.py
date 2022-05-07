@@ -87,6 +87,8 @@ def readmediansfromCSV(csv_file):
 
 medians_list = readmediansfromCSV(course_medians)['medians_list']
 
+import random
+
 @app.route('/all_professors_home', methods=['GET'])
 def GetAllProfessorsHome():
     profList = []
@@ -98,7 +100,6 @@ def GetAllProfessorsHome():
             profList.append([n, prof['overall_rating'], prof['review']])
     k = random.randint(0, len(profList)-1)
     profList3 = [profList[k], profList[k+1], profList[k+2]]
-        
     return {'all_professors_home' : profList3}
 
 @app.route('/get_median_info', methods=['GET'])
@@ -110,8 +111,6 @@ def medianInfo():
         if courseAbbrev in mI['Dept']:
             allInfo.append([mI['Dept'], mI['Professor'], mI['Median Grade'], mI['Semester'], mI['# of Students']])
     return {'allInfo' : allInfo}
-
-import random
 
 @app.route('/get_median_home', methods=['GET'])
 @cross_origin()
