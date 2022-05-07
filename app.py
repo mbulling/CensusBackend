@@ -16,6 +16,10 @@ course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
 gym_file = "./data/gym_list.csv"
 
+@app.route('/')
+def home():
+    return "<h1>API is running</h1>"
+
 def readgymfromCSV(csv_file):
     try:
         with open(csv_file) as f:
