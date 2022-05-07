@@ -14,10 +14,29 @@ app = Flask(__name__)
 prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
+gym_file = "./data/gym_list.csv"
 
-@app.route('/')
-def home():
-    return "<h1>API is running</h1>"
+def readgymfromCSV(csv_file):
+    try:
+        with open(csv_file) as f:
+            lst = []
+            csv_reader = csv.DictReader(f)
+            for gym in csv_reader:
+                lst.append(dict(gym))
+            gyms = {"Helen Newman Fitness Center":[], "Teagle Down Fitness Center":[],
+            "Teagle Up Fitness Center":[],"Noyes Fitness Center":[],
+            "Toni Morrison Fitness Center":[],"HNH Court 1":[],"HNH Court 2":[]}
+            # print(lst)
+            for gym in lst:
+                # print(gym)
+                if gym['title'] in gyms:
+                    gyms[gym['title']].append((gym['percentage'], gym['count'], gym['time'])) 
+            return gyms
+    except IOError:
+        print("I/O error")
+
+gym_list = readgymfromCSV(gym_file)
+print(gym_list)
 
 def readproffromCSV(csv_file):
     try:
@@ -66,6 +85,23 @@ def medianInfo():
         if courseAbbrev in mI['Dept']:
             allInfo.append([mI['Dept'], mI['Professor'], mI['Median Grade'], mI['Semester'], mI['# of Students']])
     return {'allInfo' : allInfo}
+
+import random
+
+@app.route('/get_median_home', methods=['GET'])
+def medianHome():
+    allInfo2 = []
+    for mI in medians_list:
+            allInfo2.append([mI['Dept'], mI['Median Grade']])
+    retCourse=[]
+    for i in range(6):
+        k = random.randint(0, len(allInfo2))
+        if k not in retCourse:
+            retCourse.append(k)
+    retCourseInfo=[]
+    for j in retCourse:
+        retCourseInfo.append(allInfo2[j])
+    return {'retCourseInfo' : retCourseInfo}
 
 
 @app.route('/get_abbrev', methods=['GET'])
@@ -128,6 +164,21 @@ def get50best():
         profList2 = profList
     return {'get50best' : profList2}
 
+@app.route('/get50worst', methods=['GET'])
+def get50worst():
+    profList = []
+    for prof in prof_list:
+        n = prof['tFname'] + ' ' + prof['tLname']
+        rev = prof['review']
+        rat = prof['overall_rating']
+        if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != "." and float(rat) <= 1.5:
+            profList.append([prof['overall_rating'],n, prof['review']])
+    if len(profList) >= 51:
+        profList2 = profList[0:50]
+    else:
+        profList2 = profList
+    return {'get50worst' : profList2}
+
 @app.route('/all_professors', methods=['GET'])
 def GetAllProfessors():
     profList = []
@@ -150,4 +201,12 @@ def pullRating():
         if n == prof and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != ".":
             return {'rating' : p['overall_rating'], 'review': p['review']}
 
+@app.route('/pull_gyms', methods=['GET'])
+def getGyms():
+    gyms = gym_list
+    for gym in gyms.keys():
+        for i in range(3, len(gyms[gym])):
+            if gyms[gym][i][2] == gyms[gym][i-1][2] and  gyms[gym][i][2] == gyms[gym][i-2][2] and gyms[gym][i][2] == gyms[gym][i-3][2]:
+                gyms[gym][i-3] = (0,0,gyms[gym][i-3][2])
 
+    return {'gym_list':gyms}
