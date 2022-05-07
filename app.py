@@ -5,16 +5,22 @@ makes use of Google API (google sheet and drive), flask environment, and passing
 information to html file to visualize user-submitted data. Graphs are dynamic and
 reflect real-time changes to a database
 """
-#test
+
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 import csv, json
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
 gym_file = "./data/gym_list.csv"
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @app.route('/')
 def home():
@@ -82,6 +88,7 @@ def readmediansfromCSV(csv_file):
 medians_list = readmediansfromCSV(course_medians)['medians_list']
 
 @app.route('/get_median_info', methods=['GET'])
+@cross_origin()
 def medianInfo():
     courseAbbrev = request.args.get('cA')
     allInfo = []
@@ -93,6 +100,7 @@ def medianInfo():
 import random
 
 @app.route('/get_median_home', methods=['GET'])
+@cross_origin()
 def medianHome():
     allInfo2 = []
     for mI in medians_list:
@@ -109,6 +117,7 @@ def medianHome():
 
 
 @app.route('/get_abbrev', methods=['GET'])
+@cross_origin()
 def abbrev():
     course = request.args.get('c')
     for dC in course_list:
@@ -117,6 +126,7 @@ def abbrev():
 
 
 @app.route('/sorted_prof', methods=['GET'])
+@cross_origin()
 def SortByRating():
     lst =  sorted(prof_list, key = lambda i: i['overall_rating'],reverse=True)
     for i in range(len(lst)):
@@ -135,6 +145,7 @@ def SortByRating():
 #     return tempList
 
 @app.route('/all_subjects', methods=['GET'])
+@cross_origin()
 def GetAllSubjects():
     subjectList = []
     for course in course_list:
@@ -143,6 +154,7 @@ def GetAllSubjects():
     return {'all_subjects' : subjectList}
 
 @app.route('/all_professors2', methods=['GET'])
+@cross_origin()
 def GetAllProfessors2():
     profList = []
     for prof in prof_list:
@@ -154,6 +166,7 @@ def GetAllProfessors2():
     return {'all_professors2' : profList}
 
 @app.route('/get50best', methods=['GET'])
+@cross_origin()
 def get50best():
     profList = []
     for prof in prof_list:
@@ -169,6 +182,7 @@ def get50best():
     return {'get50best' : profList2}
 
 @app.route('/get50worst', methods=['GET'])
+@cross_origin()
 def get50worst():
     profList = []
     for prof in prof_list:
@@ -184,6 +198,7 @@ def get50worst():
     return {'get50worst' : profList2}
 
 @app.route('/all_professors', methods=['GET'])
+@cross_origin()
 def GetAllProfessors():
     profList = []
     for prof in prof_list:
@@ -196,6 +211,7 @@ def GetAllProfessors():
 
 
 @app.route('/pull_rating', methods=['GET'])
+@cross_origin()
 def pullRating():
     prof = request.args.get('c')
     for p in prof_list:
@@ -206,6 +222,7 @@ def pullRating():
             return {'rating' : p['overall_rating'], 'review': p['review']}
 
 @app.route('/pull_gyms', methods=['GET'])
+@cross_origin()
 def getGyms():
     gyms = gym_list
     for gym in gyms.keys():
