@@ -19,8 +19,8 @@ course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
 gym_file = "./data/gym_list.csv"
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 @app.route('/')
 def home():
