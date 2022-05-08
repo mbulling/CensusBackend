@@ -51,7 +51,6 @@ def readgymfromCSV(csv_file):
         print("I/O error")
 
 gym_list = readgymfromCSV(gym_file)
-print(gym_list)
 
 def readproffromCSV(csv_file):
     try:
@@ -101,20 +100,24 @@ def medianInfo():
             allInfo.append([mI['Dept'], mI['Professor'], mI['Median Grade'], mI['Semester'], mI['# of Students']])
     return {'allInfo' : allInfo}
 
-import random
+def readpollfromCSV(csv_file):
+    try:
+        with open(csv_file) as f:
+            lst = []
+            csv_reader = csv.DictReader(f)
+            for prof in csv_reader:
+                lst.append(dict(prof))
+            return {'poll_list' : lst}
+    except IOError:
+        print("I/O error")
 
-@app.route('/all_professors_home', methods=['GET'])
-def GetAllProfessorsHome():
-    profList = []
-    for prof in prof_list:
-        n = prof['tFname'] + ' ' + prof['tLname']
-        rev = prof['review']
-        rat = prof['overall_rating']
-        if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != "." and len(rev) >= 200:
-            profList.append([n, prof['overall_rating'], prof['review']])
-    k = random.randint(0, len(profList)-1)
-    profList3 = [profList[k], profList[k+1], profList[k+2]]
-    return {'all_professors_home' : profList3}
+poll_list = readpollfromCSV(poll_file)['poll_list']
+
+@app.route('/get_polls', methods=['GET'])
+def getPoll():
+    return {'pollInfo' : poll_list}
+
+import random
 
 @app.route('/get_median_home', methods=['GET'])
 def medianHome():
@@ -217,6 +220,20 @@ def GetAllProfessors():
         if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != ".":
             profList.append([n, prof['overall_rating'], prof['review']])
     return {'all_professors' : profList}
+
+@app.route('/all_professors_home', methods=['GET'])
+def GetAllProfessorsHome():
+    profList = []
+    for prof in prof_list:
+        n = prof['tFname'] + ' ' + prof['tLname']
+        rev = prof['review']
+        rat = prof['overall_rating']
+        if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != "." and len(rev) >= 200:
+            profList.append([n, prof['overall_rating'], prof['review']])
+    k = random.randint(0, len(profList)-1)
+    profList3 = [profList[k], profList[k+1], profList[k+2]]
+        
+    return {'all_professors_home' : profList3}
 
 
 @app.route('/pull_rating', methods=['GET'])
