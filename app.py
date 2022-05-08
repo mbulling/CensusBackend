@@ -46,7 +46,6 @@ def readgymfromCSV(csv_file):
         print("I/O error")
 
 gym_list = readgymfromCSV(gym_file)
-print(gym_list)
 
 def readproffromCSV(csv_file):
     try:
@@ -87,24 +86,7 @@ def readmediansfromCSV(csv_file):
 
 medians_list = readmediansfromCSV(course_medians)['medians_list']
 
-import random
-
-@app.route('/all_professors_home', methods=['GET'])
-@cross_origin()
-def GetAllProfessorsHome():
-    profList = []
-    for prof in prof_list:
-        n = prof['tFname'] + ' ' + prof['tLname']
-        rev = prof['review']
-        rat = prof['overall_rating']
-        if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != "." and len(rev) >= 200:
-            profList.append([n, prof['overall_rating'], prof['review']])
-    k = random.randint(0, len(profList)-1)
-    profList3 = [profList[k], profList[k+1], profList[k+2]]
-    return {'all_professors_home' : profList3}
-
 @app.route('/get_median_info', methods=['GET'])
-@cross_origin()
 def medianInfo():
     courseAbbrev = request.args.get('cA')
     allInfo = []
@@ -113,8 +95,26 @@ def medianInfo():
             allInfo.append([mI['Dept'], mI['Professor'], mI['Median Grade'], mI['Semester'], mI['# of Students']])
     return {'allInfo' : allInfo}
 
+def readpollfromCSV(csv_file):
+    try:
+        with open(csv_file) as f:
+            lst = []
+            csv_reader = csv.DictReader(f)
+            for prof in csv_reader:
+                lst.append(dict(prof))
+            return {'poll_list' : lst}
+    except IOError:
+        print("I/O error")
+
+poll_list = readpollfromCSV(poll_file)['poll_list']
+
+@app.route('/get_polls', methods=['GET'])
+def getPoll():
+    return {'pollInfo' : poll_list}
+
+import random
+
 @app.route('/get_median_home', methods=['GET'])
-@cross_origin()
 def medianHome():
     allInfo2 = []
     for mI in medians_list:
@@ -131,7 +131,6 @@ def medianHome():
 
 
 @app.route('/get_abbrev', methods=['GET'])
-@cross_origin()
 def abbrev():
     course = request.args.get('c')
     for dC in course_list:
@@ -140,7 +139,6 @@ def abbrev():
 
 
 @app.route('/sorted_prof', methods=['GET'])
-@cross_origin()
 def SortByRating():
     lst =  sorted(prof_list, key = lambda i: i['overall_rating'],reverse=True)
     for i in range(len(lst)):
@@ -159,7 +157,6 @@ def SortByRating():
 #     return tempList
 
 @app.route('/all_subjects', methods=['GET'])
-@cross_origin()
 def GetAllSubjects():
     subjectList = []
     for course in course_list:
@@ -168,7 +165,6 @@ def GetAllSubjects():
     return {'all_subjects' : subjectList}
 
 @app.route('/all_professors2', methods=['GET'])
-@cross_origin()
 def GetAllProfessors2():
     profList = []
     for prof in prof_list:
@@ -180,7 +176,6 @@ def GetAllProfessors2():
     return {'all_professors2' : profList}
 
 @app.route('/get50best', methods=['GET'])
-@cross_origin()
 def get50best():
     profList = []
     for prof in prof_list:
@@ -196,7 +191,6 @@ def get50best():
     return {'get50best' : profList2}
 
 @app.route('/get50worst', methods=['GET'])
-@cross_origin()
 def get50worst():
     profList = []
     for prof in prof_list:
@@ -212,7 +206,6 @@ def get50worst():
     return {'get50worst' : profList2}
 
 @app.route('/all_professors', methods=['GET'])
-@cross_origin()
 def GetAllProfessors():
     profList = []
     for prof in prof_list:
@@ -223,9 +216,22 @@ def GetAllProfessors():
             profList.append([n, prof['overall_rating'], prof['review']])
     return {'all_professors' : profList}
 
+@app.route('/all_professors_home', methods=['GET'])
+def GetAllProfessorsHome():
+    profList = []
+    for prof in prof_list:
+        n = prof['tFname'] + ' ' + prof['tLname']
+        rev = prof['review']
+        rat = prof['overall_rating']
+        if n not in profList and rev != "" and rat != "" and rat != "N/A" and n[0] != "." and n[1] != "." and len(rev) >= 200:
+            profList.append([n, prof['overall_rating'], prof['review']])
+    k = random.randint(0, len(profList)-1)
+    profList3 = [profList[k], profList[k+1], profList[k+2]]
+        
+    return {'all_professors_home' : profList3}
+
 
 @app.route('/pull_rating', methods=['GET'])
-@cross_origin()
 def pullRating():
     prof = request.args.get('c')
     for p in prof_list:
@@ -236,7 +242,6 @@ def pullRating():
             return {'rating' : p['overall_rating'], 'review': p['review']}
 
 @app.route('/pull_gyms', methods=['GET'])
-@cross_origin()
 def getGyms():
     gyms = gym_list
     for gym in gyms.keys():
