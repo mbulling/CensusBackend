@@ -23,6 +23,7 @@ prof_file = "./data/professor_list.csv"
 course_abbrev = "./data/courses.csv"
 course_medians = "./data/coursemedians.csv"
 gym_file = "./data/gym_list.csv"
+poll_file = "./data/polls.csv"
 
 # if __name__ == '__main__':
 #     app.run(debug=True)
